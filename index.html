@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="cyberpunk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KREASI // GenZ Creative Hub & Sharing Space</title>
+  
+  <!-- Meta SEO -->
+  <meta name="description" content="KREASI adalah platform kreatif tempat anak muda saling berbagi karya seni digital, musik/beats, tulisan, dan kode pemrograman secara interaktif dan seru.">
+  <meta name="keywords" content="Gen Z, karya, sharing, komentar, brutalism, cyberpunk, y2k, art, beats, code, writing">
+  <meta name="author" content="KREASI Team">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header" id="main-header">
+    <div class="logo" id="site-logo">
+      KREASI <span>GEN Z</span>
+    </div>
+    
+    <div class="header-actions">
+      <!-- Theme Switcher -->
+      <div class="vibe-pill-selector" id="theme-selector" role="group" aria-label="Vibe Theme Selector">
+        <button class="vibe-option active" data-vibe="cyberpunk" id="vibe-btn-cyberpunk">🕶️ Neon</button>
+        <button class="vibe-option" data-vibe="y2k" id="vibe-btn-y2k">💫 Y2K</button>
+        <button class="vibe-option" data-vibe="acid" id="vibe-btn-acid">🍋 Acid</button>
+      </div>
+      
+      <!-- Auth / Profile Area -->
+      <div id="header-auth-area">
+        <!-- Login/Register Button (shown when logged out) -->
+        <button class="neo-btn" id="header-login-btn" style="padding: 8px 16px; font-size: 0.9rem;"><i class="fa-solid fa-right-to-bracket"></i> Masuk / Daftar</button>
+
+        <!-- User Profile Badge (shown when logged in) -->
+        <div class="user-profile-badge" id="header-profile-badge" aria-label="User Profile Settings" style="display: none;">
+          <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix" alt="User Avatar" id="header-profile-avatar">
+          <span id="header-profile-username">@loading</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main id="main-content">
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero-section">
+      <div class="hero-content">
+        <h1>Tempat Sharing Karya Anak Muda <mark>Autentik</mark></h1>
+        <p>
+          Bebas berekspresi! Bagikan ilustrasi digital, ketukan musik (beats), puisi puitis, hingga baris kode ciamikmu. Dapatkan feedback instan, kumpulkan vibrasi positif, dan berkolaborasi secara real-time.
+        </p>
+        <div class="hero-cta">
+          <button class="neo-btn primary" id="hero-create-btn">
+            <i class="fa-solid fa-plus"></i> Share Karya Kamu
+          </button>
+          <button class="neo-btn outline" id="hero-scroll-btn">
+            Explore Feed <i class="fa-solid fa-arrow-down"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Bento Stats Card -->
+      <div class="hero-stats-card" id="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-works-count">0</div>
+          <div class="stat-label">Karya<br>Dibagikan</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-comments-count">0</div>
+          <div class="stat-label">Komentar<br>Ditulis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-likes-count">0</div>
+          <div class="stat-label">Likes<br>Diberikan</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER BAR -->
+    <section class="feed-filter-container" id="feed-filters">
+      <div class="filter-pills" id="category-filter-pills" role="tablist">
+        <button class="filter-pill active" data-category="all" role="tab" aria-selected="true" id="filter-btn-all">All Creations</button>
+        <button class="filter-pill" data-category="art" role="tab" aria-selected="false" id="filter-btn-art">🎨 Art</button>
+        <button class="filter-pill" data-category="beats" role="tab" aria-selected="false" id="filter-btn-beats">🎵 Beats</button>
+        <button class="filter-pill" data-category="writing" role="tab" aria-selected="false" id="filter-btn-writing">✍️ Writing</button>
+        <button class="filter-pill" data-category="code" role="tab" aria-selected="false" id="filter-btn-code">💻 Code</button>
+      </div>
+      
+      <div class="search-wrapper">
+        <input type="text" class="search-input" id="feed-search-input" placeholder="Cari karya atau kreator..." aria-label="Search creations">
+      </div>
+    </section>
+
+    <!-- BENTO GRID FEED -->
+    <section class="bento-feed-section" id="feed-section">
+      <div class="bento-grid" id="creations-bento-grid">
+        <!-- Cards will be dynamically injected here via app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" id="site-footer">
+    <div class="logo">KREASI</div>
+    <p>Dibuat khusus untuk Gen Z yang suka berkreasi, berbagi, dan berinteraksi. © 2026 KREASI.</p>
+    <div class="footer-links">
+      <a href="#about" id="footer-link-about">Tentang Kami</a>
+      <a href="#rules" id="footer-link-rules">Community Guidelines</a>
+      <a href="#privacy" id="footer-link-privacy">Kebijakan Privasi</a>
+    </div>
+  </footer>
+
+  <!-- --- MODALS --- -->
+
+  <!-- 1. DETAIL WORK MODAL -->
+  <div class="modal-overlay" id="detail-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <h2 id="detail-modal-title">Judul Karya</h2>
+        <button class="modal-close-btn" id="detail-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div class="detail-splitscreen">
+          
+          <!-- Media Display -->
+          <div class="detail-media-container" id="detail-media-container">
+            <!-- Media content (img, text, code, music) will be loaded here -->
+          </div>
+          
+          <!-- Meta & Engagement -->
+          <div class="detail-info-panel">
+            <div class="detail-author-row">
+              <div class="author-meta">
+                <img src="" alt="Avatar" id="detail-author-avatar">
+                <div>
+                  <h3 id="detail-author-name">Nama Kreator</h3>
+                  <p id="detail-author-handle">@username</p>
+                </div>
+              </div>
+              <button class="neo-btn primary" id="detail-like-btn">
+                <i class="fa-solid fa-heart"></i> <span id="detail-like-count">0</span>
+              </button>
+            </div>
+            
+            <p class="detail-description" id="detail-work-description">Deskripsi karya akan ditampilkan di sini.</p>
+            
+            <!-- Comment Section -->
+            <div class="comments-section">
+              <h4>Diskusi Karya (<span id="detail-comments-count">0</span>)</h4>
+              <div class="comments-list" id="detail-comments-list">
+                <!-- Comments will be injected here -->
+              </div>
+              
+              <!-- Comment Form -->
+              <form class="comment-form" id="detail-comment-form">
+                <input type="text" id="detail-comment-input" placeholder="Tulis komentar kerenmu..." required aria-label="Comment text">
+                <button type="submit" class="neo-btn" id="detail-comment-submit">Kirim</button>
+              </form>
+            </div>
+            
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. CREATE WORK MODAL -->
+  <div class="modal-overlay" id="create-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <h2>Bagikan Karya Baru</h2>
+        <button class="modal-close-btn" id="create-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <form id="create-work-form">
+          <!-- Selection of Work Type -->
+          <div class="form-group">
+            <label>Tipe Karya</label>
+            <div class="type-selector-grid" id="create-type-selector">
+              <div class="type-option-card selected" data-type="art" id="type-opt-art">
+                <i class="fa-solid fa-palette"></i> Art
+              </div>
+              <div class="type-option-card" data-type="beats" id="type-opt-beats">
+                <i class="fa-solid fa-music"></i> Beats
+              </div>
+              <div class="type-option-card" data-type="writing" id="type-opt-writing">
+                <i class="fa-solid fa-pen-nib"></i> Writing
+              </div>
+              <div class="type-option-card" data-type="code" id="type-opt-code">
+                <i class="fa-solid fa-code"></i> Code
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Fields -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="create-title-input">Judul Karya</label>
+              <input type="text" id="create-title-input" placeholder="Misal: Sunset Neon 2077" required>
+            </div>
+            <div class="form-group">
+              <label for="create-tags-input">Tags (Pisahkan koma)</label>
+              <input type="text" id="create-tags-input" placeholder="Misal: retro, lofi, vibe">
+            </div>
+          </div>
+
+          <!-- Dynamic Input depending on selected type -->
+          <div class="form-group" id="media-link-group">
+            <label for="create-media-input" id="media-link-label">Image URL / Link Karya</label>
+            <input type="text" id="create-media-input" placeholder="Masukkan link gambar (atau biarkan kosong untuk default)">
+          </div>
+
+          <div class="form-group" id="text-content-group" style="display: none;">
+            <label for="create-content-input" id="text-content-label">Isi Karya (Puisi / Kode)</label>
+            <textarea id="create-content-input" rows="6" placeholder="Tuliskan karya tulismu atau snippet kodemu di sini..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="create-desc-input">Deskripsi Singkat</label>
+            <textarea id="create-desc-input" rows="3" placeholder="Ceritakan konsep di balik karyamu ini..." required></textarea>
+          </div>
+
+          <button type="submit" class="neo-btn primary" style="width: 100%; display: justify-content; justify-content: center;" id="create-submit-btn">
+            Publish Karya <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. EDIT PROFILE MODAL -->
+  <div class="modal-overlay" id="profile-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Sesuaikan Vibe-mu</h2>
+        <button class="modal-close-btn" id="profile-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <form id="edit-profile-form">
+          <div class="form-group">
+            <label for="profile-name-input">Display Name</label>
+            <input type="text" id="profile-name-input" placeholder="Nama Aslimu / Panggilan" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="profile-handle-input">Username Handle</label>
+            <input type="text" id="profile-handle-input" placeholder="@username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-avatar-select">Pilih Avatar Style</label>
+            <select id="profile-avatar-select">
+              <option value="Felix">Felix (Pixel Art)</option>
+              <option value="Bella">Bella (Pixel Art)</option>
+              <option value="Jack">Jack (Pixel Art)</option>
+              <option value="Milo">Milo (Pixel Art)</option>
+              <option value="Chloe">Chloe (Pixel Art)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-bio-input">Bio Singkat</label>
+            <textarea id="profile-bio-input" rows="3" placeholder="Gambarkan vibe dirimu dalam beberapa patah kata..."></textarea>
+          </div>
+
+          <button type="submit" class="neo-btn primary" style="width: 100%;" id="profile-submit-btn">
+            Simpan Perubahan <i class="fa-solid fa-check"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PROFILE DASHBOARD MODAL (WITH HISTORY & LOGOUT) -->
+  <div class="modal-overlay" id="profile-dashboard-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper" style="max-width: 650px;">
+      <div class="modal-header">
+        <h2>Dashboard Profil</h2>
+        <button class="modal-close-btn" id="profile-dashboard-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <!-- Profile info section -->
+        <div style="display: flex; gap: 20px; align-items: center; border-bottom: 3px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+          <img src="" alt="Avatar" id="dashboard-avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--accent-primary); background-color: var(--bg-primary);">
+          <div style="flex-grow: 1;">
+            <h3 id="dashboard-display-name" style="font-size: 1.5rem; margin-bottom: 2px;">Nama Tampilan</h3>
+            <p id="dashboard-handle" style="color: var(--accent-secondary); font-weight: 700; margin-bottom: 10px;">@handle</p>
+            <p id="dashboard-bio" style="color: var(--text-secondary); font-size: 0.95rem;">Bio pengguna di sini.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="neo-btn outline" id="dashboard-edit-btn" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fa-solid fa-pen"></i> Edit Profil</button>
+            <button class="neo-btn primary" id="dashboard-logout-btn" style="padding: 6px 12px; font-size: 0.8rem; background-color: var(--accent-primary);"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+          </div>
+        </div>
+
+        <!-- History tabs section -->
+        <div class="profile-history-section">
+          <div style="display: flex; gap: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">
+            <button class="neo-btn outline active" id="history-tab-works" style="flex: 1; text-align: center; font-size: 0.9rem; padding: 6px 10px;">Karya Saya (<span id="history-works-count">0</span>)</button>
+            <button class="neo-btn outline" id="history-tab-comments" style="flex: 1; text-align: center; font-size: 0.9rem; padding: 6px 10px;">Komentar Saya (<span id="history-comments-count">0</span>)</button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div id="history-content-works" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+            <!-- User's posted works list will go here -->
+          </div>
+          
+          <div id="history-content-comments" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; display: none;">
+            <!-- User's commenting history log will go here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. AUTH MODAL (LOGIN / REGISTER) -->
+  <div class="modal-overlay" id="auth-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper" style="max-width: 450px;">
+      <div class="modal-header">
+        <h2 id="auth-modal-title">Masuk ke KREASI</h2>
+        <button class="modal-close-btn" id="auth-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <!-- Tab selector -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">
+          <button class="neo-btn outline active" id="auth-tab-login" style="flex: 1; text-align: center;">Masuk</button>
+          <button class="neo-btn outline" id="auth-tab-register" style="flex: 1; text-align: center;">Daftar</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email-input">Email</label>
+            <input type="email" id="login-email-input" placeholder="nama@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password-input">Password</label>
+            <input type="password" id="login-password-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="neo-btn primary" style="width: 100%; justify-content: center; display: inline-flex;" id="login-submit-btn">Masuk <i class="fa-solid fa-right-to-bracket" style="margin-left: 8px;"></i></button>
+        </form>
+
+        <!-- Register Form (Hidden by default) -->
+        <form id="register-form" style="display: none;">
+          <div class="form-group">
+            <label for="reg-email-input">Email</label>
+            <input type="email" id="reg-email-input" placeholder="nama@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-username-input">Username Handle</label>
+            <input type="text" id="reg-username-input" placeholder="misal: @kreator_muda" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-name-input">Display Name</label>
+            <input type="text" id="reg-name-input" placeholder="Nama Lengkap / Panggilan" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password-input">Password</label>
+            <input type="password" id="reg-password-input" placeholder="Minimal 6 karakter" required minlength="6">
+          </div>
+          <button type="submit" class="neo-btn primary" style="width: 100%; justify-content: center; display: inline-flex;" id="register-submit-btn">Buat Akun <i class="fa-solid fa-user-plus" style="margin-left: 8px;"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. LIMITED PROFILE MODAL (FOR GUESTS) -->
+  <div class="modal-overlay" id="limited-profile-modal" aria-hidden="true" role="dialog">
+    <div class="modal-wrapper" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2>Profil Kreator</h2>
+        <button class="modal-close-btn" id="limited-profile-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-content">
+        <!-- Creator info card -->
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; border-bottom: 2px dashed var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+          <img src="" alt="Avatar" id="limited-avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--accent-primary); background-color: var(--bg-primary);">
+          <div>
+            <h3 id="limited-display-name" style="font-size: 1.4rem; margin-bottom: 2px;">Nama Kreator</h3>
+            <p id="limited-handle" style="color: var(--accent-secondary); font-weight: 700;">@username</p>
+          </div>
+          <p id="limited-bio" style="color: var(--text-secondary); font-size: 0.9rem; font-style: italic;">Bio singkat kreator.</p>
+        </div>
+
+        <!-- Locked indicators -->
+        <div style="background-color: var(--bg-primary); border: 2px solid var(--border-color); padding: 15px; border-radius: 4px; box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 20px;">
+          <h4 style="font-family: var(--font-heading); color: var(--accent-primary); margin-bottom: 12px; font-size: 1rem;"><i class="fa-solid fa-lock"></i> Detail Akun Terkunci</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+            <li><i class="fa-solid fa-ban" style="color: var(--accent-primary); margin-right: 8px;"></i> Riwayat karya lengkap (Tersembunyi)</li>
+            <li><i class="fa-solid fa-ban" style="color: var(--accent-primary); margin-right: 8px;"></i> Informasi email & kontak (Tersembunyi)</li>
+            <li><i class="fa-solid fa-ban" style="color: var(--accent-primary); margin-right: 8px;"></i> Riwayat komentar & interaksi (Tersembunyi)</li>
+          </ul>
+          
+          <p style="font-size: 0.85rem; line-height: 1.4; color: var(--text-primary);">
+            Ingin kepoin karya menarik dari <strong id="limited-prompt-username">@username</strong> lebih lengkap? Daftar member KREASI terlebih dahulu secara gratis!
+          </p>
+        </div>
+
+        <!-- Action Button -->
+        <button class="neo-btn primary" id="limited-register-btn" style="width: 100%; justify-content: center; display: inline-flex;">
+          Daftar Member Sekarang <i class="fa-solid fa-user-plus" style="margin-left: 8px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="database.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
