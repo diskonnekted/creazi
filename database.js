@@ -53,6 +53,106 @@ class KreasiDatabase {
       localStorage.setItem("kreasi_creators", JSON.stringify(defaultCreators));
     }
 
+    // Seed default works if empty
+    if (!localStorage.getItem("kreasi_works")) {
+      const defaultWorks = [
+        {
+          id: "work-1",
+          type: "art",
+          title: "Hyper-Street Tokyo 2077",
+          authorId: "neon_glitch",
+          mediaUrl: "assets/cyberpunk_art.png",
+          description: "Refleksi masa depan kota Tokyo yang dipenuhi lampu neon, reklame hologram, dan gang sempit. Menggunakan 3D render blender dikombinasikan dengan sentuhan finishing kuas digital Photoshop.",
+          tags: ["cyberpunk", "3d", "neon", "tokyo"],
+          likes: 142,
+          likedBy: [],
+          comments: [
+            { author: "@skater_vibe", avatar: "Felix", text: "Gila keren parah pencahayaannya! Detail neonnya dapet banget.", time: "2 jam lalu" },
+            { author: "@html_wizard", avatar: "Chloe", text: "Ini render 3D-nya berapa lama bro? Rapi bgt!", time: "1 jam lalu" }
+          ],
+          layoutClass: "tall"
+        },
+        {
+          id: "work-2",
+          type: "beats",
+          title: "Jam 2 Pagi di Kamar Lofi",
+          authorId: "lofi_chords",
+          mediaUrl: "",
+          description: "Ketukan musik lofi santai dengan balutan melodi piano klasik yang menenangkan. Dibuat khusus untuk menemani belajar atau sekadar bersantai di kala malam sunyi. Menggunakan Ableton Live.",
+          tags: ["lofi", "beats", "chill", "music"],
+          likes: 98,
+          likedBy: [],
+          comments: [
+            { author: "@midnight_poet", avatar: "Jack", text: "Dengerin ini sambil nulis puisi langsung dapet banyak bait. Makasih beat-nya!", time: "5 jam lalu" }
+          ],
+          layoutClass: "regular"
+        },
+        {
+          id: "work-3",
+          type: "writing",
+          title: "Kepingan Kota Kelabu",
+          authorId: "midnight_poet",
+          mediaUrl: "",
+          description: "Sebuah sajak singkat tentang rasa kesepian dan pencarian makna diri di tengah hiruk-pikuk gemerlap lampu kota besar metropolitan.",
+          tags: ["sajak", "poetry", "writing", "indie"],
+          likes: 67,
+          likedBy: [],
+          content: "Di bawah neon yang berkedip pelan,\nkota ini menampung jutaan angan.\nNamun di sudut warung kopi yang sepi,\naku mendengarkan sunyi yang menari.\n\nApakah kita hanya figuran?\nAtau hanya warna yang pudar perlahan?",
+          comments: [
+            { author: "@neon_glitch", avatar: "Milo", text: "Kerasa banget vibe melankolisnya. Bikin termenung.", time: "1 hari lalu" }
+          ],
+          layoutClass: "wide"
+        },
+        {
+          id: "work-4",
+          type: "code",
+          title: "Matrix Rain Canvas Generator",
+          authorId: "html_wizard",
+          mediaUrl: "",
+          description: "CSS & JS generator super ringan untuk menampilkan efek hujan teks Matrix legendaris di canvas HTML5. Sangat responsif dan gampang ditaruh di portofoliomu.",
+          tags: ["code", "js", "canvas", "matrix"],
+          likes: 85,
+          likedBy: [],
+          content: "// Canvas Setup & Render Loop\nconst initMatrix = (canvasId) => {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext('2d');\n  \n  canvas.width = window.innerWidth;\n  canvas.height = window.innerHeight;\n  \n  const chars = \"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\";\n  const fontSize = 16;\n  const columns = canvas.width / fontSize;\n  \n  const drops = Array(Math.floor(columns)).fill(1);\n  \n  const draw = () => {\n    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';\n    ctx.fillRect(0, 0, canvas.width, canvas.height);\n    \n    ctx.fillStyle = '#0f8'; // Neon green\n    ctx.font = fontSize + 'px monospace';\n    \n    drops.forEach((y, x) => {\n      const text = chars[Math.floor(Math.random() * chars.length)];\n      ctx.fillText(text, x * fontSize, y * fontSize);\n      \n      if (y * fontSize > canvas.height && Math.random() > 0.975) {\n        drops[x] = 0;\n      }\n      drops[x]++;\n    });\n  };\n  setInterval(draw, 33);\n};",
+          comments: [
+            { author: "@skater_vibe", avatar: "Felix", text: "Bakal gw pake di layout profil gw nih! Thx sharingnya.", time: "3 hari lalu" }
+          ],
+          layoutClass: "regular"
+        },
+        {
+          id: "work-5",
+          type: "art",
+          title: "Y2K Chrome Bubblegum",
+          authorId: "neon_glitch",
+          mediaUrl: "assets/y2k_aesthetic.png",
+          description: "Eksperimen tekstur logam cair gelembung khas era akhir 90an. Ingin menghidupkan kembali nostalgia masa kecil.",
+          tags: ["y2k", "3d", "render", "retro"],
+          likes: 120,
+          likedBy: [],
+          comments: [
+            { author: "@lofi_chords", avatar: "Bella", text: "Sumpah tekstur glossynya mantep banget kayak permen beneran.", time: "2 hari lalu" }
+          ],
+          layoutClass: "regular"
+        },
+        {
+          id: "work-6",
+          type: "art",
+          title: "Neubrutalist Web Mockup",
+          authorId: "html_wizard",
+          mediaUrl: "assets/neubrutalist_art.png",
+          description: "Layout mockup poster digital dengan konsep Neubrutalisme. Penuh garis tebal dan tabrakan warna cerah.",
+          tags: ["brutalism", "poster", "design", "graphic"],
+          likes: 104,
+          likedBy: [],
+          comments: [
+            { author: "@neon_glitch", avatar: "Milo", text: "Garis hitam tebalnya juara! Sangat raw.", time: "1 hari lalu" }
+          ],
+          layoutClass: "tall"
+        }
+      ];
+      localStorage.setItem("kreasi_works", JSON.stringify(defaultWorks));
+    }
+
     // Seed default session as guest initially if empty
     if (!localStorage.getItem("kreasi_session")) {
       localStorage.setItem("kreasi_session", JSON.stringify(null));
