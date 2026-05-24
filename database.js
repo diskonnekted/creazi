@@ -10,6 +10,14 @@
 const SUPABASE_URL = "https://rhyjrvydkwcbtpjjfyou.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoeWpydnlka3djYnRwampmeW91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MjAyMTMsImV4cCI6MjA5NTE5NjIxM30.tQHkkN0vjNmpLDdzdukkPS2Sxl0UYyRdp0zJ5oSpOHo";
 
+// Static UUIDs to satisfy PostgreSQL UUID key constraints
+const MOCK_UUIDS = {
+  neon_glitch: "da6e7c10-2b1a-4d2b-8a8b-1e2f3a4b5c6d",
+  lofi_chords: "da6e7c10-2b1a-4d2b-8a8b-2f3a4b5c6d7e",
+  midnight_poet: "da6e7c10-2b1a-4d2b-8a8b-3a4b5c6d7e8f",
+  html_wizard: "da6e7c10-2b1a-4d2b-8a8b-4b5c6d7e8f9a"
+};
+
 class KreasiDatabase {
   constructor() {
     this.isSupabase = SUPABASE_URL !== "" && SUPABASE_ANON_KEY !== "";
@@ -25,7 +33,6 @@ class KreasiDatabase {
   // --- SUPABASE INITIALIZATION ---
   async initSupabase() {
     console.log("KREASI: Menggunakan Database Supabase (Cloud Mode)");
-    // Load Supabase SDK dynamically if not loaded
     if (!window.supabase) {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
@@ -42,25 +49,23 @@ class KreasiDatabase {
   // --- LOCALSTORAGE INITIALIZATION ---
   initLocalStorageDB() {
     console.log("KREASI: Menggunakan Database LocalStorage (Simulasi)");
-    // Seed default creators if empty
     if (!localStorage.getItem("kreasi_creators")) {
       const defaultCreators = {
-        neon_glitch: { id: "neon_glitch", username: "@neon_glitch", displayName: "Zaki", avatar: "Milo", bio: "3D Digital Artist based in Bandung. Cyberpunk lover.", email: "zaki@kreasi.id", password: "password123" },
-        lofi_chords: { id: "lofi_chords", username: "@lofi_chords", displayName: "Dina", avatar: "Bella", bio: "Sound designer & bedroom producer. Lofi beats specialist.", email: "dina@kreasi.id", password: "password123" },
-        midnight_poet: { id: "midnight_poet", username: "@midnight_poet", displayName: "Fajar", avatar: "Jack", bio: "Menulis sajak kala malam tiba.", email: "fajar@kreasi.id", password: "password123" },
-        html_wizard: { id: "html_wizard", username: "@html_wizard", displayName: "Adit", avatar: "Chloe", bio: "Creative frontend developer. CSS art enthusiast.", email: "adit@kreasi.id", password: "password123" }
+        [MOCK_UUIDS.neon_glitch]: { id: MOCK_UUIDS.neon_glitch, username: "@neon_glitch", displayName: "Zaki", avatar: "Milo", bio: "3D Digital Artist based in Bandung. Cyberpunk lover.", email: "zaki@kreasi.id", password: "password123" },
+        [MOCK_UUIDS.lofi_chords]: { id: MOCK_UUIDS.lofi_chords, username: "@lofi_chords", displayName: "Dina", avatar: "Bella", bio: "Sound designer & bedroom producer. Lofi beats specialist.", email: "dina@kreasi.id", password: "password123" },
+        [MOCK_UUIDS.midnight_poet]: { id: MOCK_UUIDS.midnight_poet, username: "@midnight_poet", displayName: "Fajar", avatar: "Jack", bio: "Menulis sajak kala malam tiba.", email: "fajar@kreasi.id", password: "password123" },
+        [MOCK_UUIDS.html_wizard]: { id: MOCK_UUIDS.html_wizard, username: "@html_wizard", displayName: "Adit", avatar: "Chloe", bio: "Creative frontend developer. CSS art enthusiast.", email: "adit@kreasi.id", password: "password123" }
       };
       localStorage.setItem("kreasi_creators", JSON.stringify(defaultCreators));
     }
 
-    // Seed default works if empty
     if (!localStorage.getItem("kreasi_works")) {
       const defaultWorks = [
         {
           id: "work-1",
           type: "art",
           title: "Hyper-Street Tokyo 2077",
-          authorId: "neon_glitch",
+          authorId: MOCK_UUIDS.neon_glitch,
           mediaUrl: "assets/cyberpunk_art.png",
           description: "Refleksi masa depan kota Tokyo yang dipenuhi lampu neon, reklame hologram, dan gang sempit. Menggunakan 3D render blender dikombinasikan dengan sentuhan finishing kuas digital Photoshop.",
           tags: ["cyberpunk", "3d", "neon", "tokyo"],
@@ -76,7 +81,7 @@ class KreasiDatabase {
           id: "work-2",
           type: "beats",
           title: "Jam 2 Pagi di Kamar Lofi",
-          authorId: "lofi_chords",
+          authorId: MOCK_UUIDS.lofi_chords,
           mediaUrl: "",
           description: "Ketukan musik lofi santai dengan balutan melodi piano klasik yang menenangkan. Dibuat khusus untuk menemani belajar atau sekadar bersantai di kala malam sunyi. Menggunakan Ableton Live.",
           tags: ["lofi", "beats", "chill", "music"],
@@ -91,7 +96,7 @@ class KreasiDatabase {
           id: "work-3",
           type: "writing",
           title: "Kepingan Kota Kelabu",
-          authorId: "midnight_poet",
+          authorId: MOCK_UUIDS.midnight_poet,
           mediaUrl: "",
           description: "Sebuah sajak singkat tentang rasa kesepian dan pencarian makna diri di tengah hiruk-pikuk gemerlap lampu kota besar metropolitan.",
           tags: ["sajak", "poetry", "writing", "indie"],
@@ -107,7 +112,7 @@ class KreasiDatabase {
           id: "work-4",
           type: "code",
           title: "Matrix Rain Canvas Generator",
-          authorId: "html_wizard",
+          authorId: MOCK_UUIDS.html_wizard,
           mediaUrl: "",
           description: "CSS & JS generator super ringan untuk menampilkan efek hujan teks Matrix legendaris di canvas HTML5. Sangat responsif dan gampang ditaruh di portofoliomu.",
           tags: ["code", "js", "canvas", "matrix"],
@@ -123,7 +128,7 @@ class KreasiDatabase {
           id: "work-5",
           type: "art",
           title: "Y2K Chrome Bubblegum",
-          authorId: "neon_glitch",
+          authorId: MOCK_UUIDS.neon_glitch,
           mediaUrl: "assets/y2k_aesthetic.png",
           description: "Eksperimen tekstur logam cair gelembung khas era akhir 90an. Ingin menghidupkan kembali nostalgia masa kecil.",
           tags: ["y2k", "3d", "render", "retro"],
@@ -138,7 +143,7 @@ class KreasiDatabase {
           id: "work-6",
           type: "art",
           title: "Neubrutalist Web Mockup",
-          authorId: "html_wizard",
+          authorId: MOCK_UUIDS.html_wizard,
           mediaUrl: "assets/neubrutalist_art.png",
           description: "Layout mockup poster digital dengan konsep Neubrutalisme. Penuh garis tebal dan tabrakan warna cerah.",
           tags: ["brutalism", "poster", "design", "graphic"],
@@ -153,38 +158,71 @@ class KreasiDatabase {
       localStorage.setItem("kreasi_works", JSON.stringify(defaultWorks));
     }
 
-    // Seed default session as guest initially if empty
     if (!localStorage.getItem("kreasi_session")) {
       localStorage.setItem("kreasi_session", JSON.stringify(null));
     }
   }
 
-  // --- GETTERS & SETTERS (Local Mode) ---
-  getCreators() {
-    return JSON.parse(localStorage.getItem("kreasi_creators")) || {};
+  // --- ASYNC GETTERS (Hybrid Local / Supabase) ---
+  
+  async getCreators() {
+    if (this.isSupabase) {
+      if (!this.supabaseClient) return {};
+      const { data: profiles, error } = await this.supabaseClient
+        .from('profiles')
+        .select('*');
+      if (error) {
+        console.error("Error fetching profiles:", error);
+        return {};
+      }
+      const creators = {};
+      profiles.forEach(p => {
+        creators[p.id] = p;
+      });
+      return creators;
+    } else {
+      return JSON.parse(localStorage.getItem("kreasi_creators")) || {};
+    }
   }
 
-  saveCreators(creators) {
+  saveCreatorsLocal(creators) {
     localStorage.setItem("kreasi_creators", JSON.stringify(creators));
   }
 
-  getWorks() {
+  async getWorks() {
+    if (this.isSupabase) {
+      if (!this.supabaseClient) return [];
+      const { data: works, error } = await this.supabaseClient
+        .from('works')
+        .select('*, comments(*)');
+      if (error) {
+        console.error("Error fetching works:", error);
+        return [];
+      }
+      // Sort works by created_at descending (latest first)
+      works.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      return works;
+    } else {
+      return JSON.parse(localStorage.getItem("kreasi_works")) || [];
+    }
+  }
+
+  getWorksLocal() {
     return JSON.parse(localStorage.getItem("kreasi_works")) || [];
   }
 
-  saveWorks(works) {
+  saveWorksLocal(works) {
     localStorage.setItem("kreasi_works", JSON.stringify(works));
   }
 
   // --- AUTHENTICATION METHODS ---
   
-  // Get active session user
   async getCurrentUser() {
     if (this.isSupabase) {
       if (!this.supabaseClient) return null;
       const { data: { user } } = await this.supabaseClient.auth.getUser();
       if (!user) return null;
-      // Get profile details from custom profile table
+      
       const { data: profile } = await this.supabaseClient
         .from('profiles')
         .select('*')
@@ -196,18 +234,15 @@ class KreasiDatabase {
     }
   }
 
-  // Sign Up / Register
   async signUp(email, password, username, displayName, avatar, bio) {
     if (!username.startsWith("@")) {
       username = "@" + username;
     }
 
     if (this.isSupabase) {
-      // Supabase Signup
       const { data, error } = await this.supabaseClient.auth.signUp({ email, password });
       if (error) throw error;
       
-      // Save profile to profiles table
       const { error: profileError } = await this.supabaseClient
         .from('profiles')
         .insert([{
@@ -221,10 +256,8 @@ class KreasiDatabase {
       if (profileError) throw profileError;
       return { id: data.user.id, username, displayName, avatar, bio, email };
     } else {
-      // Local Storage Signup
       const creators = this.getCreators();
       
-      // Validation checks
       const emailExists = Object.values(creators).some(c => c.email.toLowerCase() === email.toLowerCase());
       const usernameExists = Object.values(creators).some(c => c.username.toLowerCase() === username.toLowerCase());
       
@@ -239,26 +272,23 @@ class KreasiDatabase {
         avatar,
         bio,
         email,
-        password, // stored in plain-text for mock simulation only
+        password,
         joinedDate: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
       };
 
       creators[userId] = newCreator;
-      this.saveCreators(creators);
+      this.saveCreatorsLocal(creators);
 
-      // Auto login after signup
       localStorage.setItem("kreasi_session", JSON.stringify(newCreator));
       return newCreator;
     }
   }
 
-  // Sign In / Login
   async signIn(email, password) {
     if (this.isSupabase) {
       const { data, error } = await this.supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
-      // Get profile
       const { data: profile } = await this.supabaseClient
         .from('profiles')
         .select('*')
@@ -266,7 +296,6 @@ class KreasiDatabase {
         .single();
       return profile || { id: data.user.id, email: data.user.email };
     } else {
-      // Local Storage Login
       const creators = this.getCreators();
       const user = Object.values(creators).find(
         c => c.email.toLowerCase() === email.toLowerCase() && c.password === password
@@ -279,7 +308,6 @@ class KreasiDatabase {
     }
   }
 
-  // Sign Out / Logout
   async signOut() {
     if (this.isSupabase) {
       const { error } = await this.supabaseClient.auth.signOut();
@@ -289,7 +317,6 @@ class KreasiDatabase {
     }
   }
 
-  // Edit / Update Profile
   async updateProfile(displayName, username, avatar, bio) {
     if (!username.startsWith("@")) {
       username = "@" + username;
@@ -316,15 +343,13 @@ class KreasiDatabase {
       };
 
       creators[currentUser.id] = updatedUser;
-      this.saveCreators(creators);
+      this.saveCreatorsLocal(creators);
       localStorage.setItem("kreasi_session", JSON.stringify(updatedUser));
 
-      // Also update any works authored by this user to reflect username changes
-      const works = this.getWorks();
+      const works = this.getWorksLocal();
       let worksChanged = false;
       works.forEach(w => {
         if (w.authorId === currentUser.id) {
-          // comments or nested data that holds username
           w.comments.forEach(c => {
             if (c.author === currentUser.username) {
               c.author = username;
@@ -334,44 +359,134 @@ class KreasiDatabase {
           worksChanged = true;
         }
       });
-      if (worksChanged) this.saveWorks(works);
+      if (worksChanged) this.saveWorksLocal(works);
 
       return updatedUser;
+    }
+  }
+
+  // --- SAVE WORK ---
+  async saveWork(work) {
+    if (this.isSupabase) {
+      const { error } = await this.supabaseClient
+        .from('works')
+        .insert([{
+          id: work.id,
+          type: work.type,
+          title: work.title,
+          authorId: work.authorId,
+          mediaUrl: work.mediaUrl,
+          content: work.content,
+          description: work.description,
+          tags: work.tags,
+          likes: work.likes,
+          likedBy: work.likedBy,
+          layoutClass: work.layoutClass
+        }]);
+      if (error) throw error;
+    } else {
+      const works = this.getWorksLocal();
+      works.unshift(work);
+      this.saveWorksLocal(works);
+    }
+  }
+
+  // --- ADD COMMENT ---
+  async addComment(workId, comment) {
+    if (this.isSupabase) {
+      const { error } = await this.supabaseClient
+        .from('comments')
+        .insert([{
+          workId: workId,
+          author: comment.author,
+          avatar: comment.avatar,
+          text: comment.text
+        }]);
+      if (error) throw error;
+    } else {
+      const works = this.getWorksLocal();
+      const work = works.find(w => w.id === workId);
+      if (work) {
+        work.comments.push(comment);
+        this.saveWorksLocal(works);
+      }
+    }
+  }
+
+  // --- TOGGLE LIKE ---
+  async toggleLike(workId, username) {
+    if (this.isSupabase) {
+      const { data: work, error } = await this.supabaseClient
+        .from('works')
+        .select('likes, likedBy')
+        .eq('id', workId)
+        .single();
+      if (error) throw error;
+
+      let likes = work.likes || 0;
+      let likedBy = work.likedBy || [];
+
+      if (likedBy.includes(username)) {
+        likes = Math.max(0, likes - 1);
+        likedBy = likedBy.filter(u => u !== username);
+      } else {
+        likes++;
+        likedBy.push(username);
+      }
+
+      const { error: updateError } = await this.supabaseClient
+        .from('works')
+        .update({ likes, likedBy })
+        .eq('id', workId);
+      if (updateError) throw updateError;
+    } else {
+      const works = this.getWorksLocal();
+      const work = works.find(w => w.id === workId);
+      if (work) {
+        if (work.likedBy.includes(username)) {
+          work.likes--;
+          work.likedBy = work.likedBy.filter(u => u !== username);
+        } else {
+          work.likes++;
+          work.likedBy.push(username);
+        }
+        this.saveWorksLocal(works);
+      }
     }
   }
 
   // --- ACCOUNT HISTORY & RETRIEVAL ---
   async getAccountHistory(userId) {
     if (this.isSupabase) {
-      // Supabase history fetching
       const { data: works } = await this.supabaseClient
         .from('works')
         .select('*')
-        .eq('authorId', userId)
-        .order('created_at', { ascending: false });
+        .eq('authorId', userId);
         
-      // Mock or fetch comments
       const { data: comments } = await this.supabaseClient
         .from('comments')
         .select('*, works(title, id)')
-        .eq('authorId', userId);
+        .eq('author', (await this.getCurrentUser()).username);
+
+      const parsedComments = (comments || []).map(c => ({
+        workId: c.workId,
+        workTitle: c.works ? c.works.title : "Karya",
+        text: c.text,
+        time: c.created_at ? new Date(c.created_at).toLocaleDateString() : "Baru saja"
+      }));
 
       return {
         works: works || [],
-        comments: comments || []
+        comments: parsedComments
       };
     } else {
-      // Local Storage history fetching
       const creators = this.getCreators();
       const user = creators[userId];
       if (!user) return { works: [], comments: [] };
 
-      const allWorks = this.getWorks();
-      
-      // User's works
+      const allWorks = this.getWorksLocal();
       const userWorks = allWorks.filter(w => w.authorId === userId);
 
-      // User's comments log
       const userComments = [];
       allWorks.forEach(work => {
         work.comments.forEach(comment => {

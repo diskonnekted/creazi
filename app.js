@@ -50,7 +50,7 @@ class KreasiApp {
         if (loginBtn) loginBtn.style.display = "inline-flex";
         if (profileBadge) profileBadge.style.display = "none";
       }
-      this.updateStats();
+      await this.updateStats();
     } catch (err) {
       console.error("Auth session check failed:", err);
     }
@@ -219,8 +219,8 @@ class KreasiApp {
     const detailAuthorMeta = document.querySelector(".detail-info-panel .author-meta");
     if (detailAuthorMeta) {
       detailAuthorMeta.style.cursor = "pointer";
-      detailAuthorMeta.addEventListener("click", () => {
-        const worksList = window.KreasiDB.getWorks();
+      detailAuthorMeta.addEventListener("click", async () => {
+        const worksList = await window.KreasiDB.getWorks();
         const work = worksList.find(w => w.id === this.activeDetailId);
         if (work) {
           this.closeModal(this.detailModal);
@@ -316,8 +316,8 @@ class KreasiApp {
   }
 
   // --- STATS ---
-  updateStats() {
-    const worksList = window.KreasiDB.getWorks();
+  async updateStats() {
+    const worksList = await window.KreasiDB.getWorks();
     
     // Total works
     this.statWorksCount.textContent = worksList.length;
@@ -334,122 +334,137 @@ class KreasiApp {
   }
 
   // --- RENDER BENTO FEED ---
-  renderFeed() {
-    this.bentoGrid.innerHTML = "";
-    const creatorsList = window.KreasiDB.getCreators();
-    const worksList = window.KreasiDB.getWorks();
+  async renderFeed() {
+    this.bentoGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: var(--accent-secondary); margin-bottom: 15px;"></i>
+        <h3 style="font-family: var(--font-heading);">Memuat Galeri Karya...</h3>
+      </div>
+    `;
 
-    const filteredWorks = worksList.filter(work => {
-      const creator = creatorsList[work.authorId] || this.currentUser || { displayName: "User", username: "@deleted" };
-      const matchesCategory = this.activeCategory === "all" || work.type === this.activeCategory;
-      const matchesSearch = work.title.toLowerCase().includes(this.searchQuery) ||
-                            creator.displayName.toLowerCase().includes(this.searchQuery) ||
-                            creator.username.toLowerCase().includes(this.searchQuery) ||
-                            work.tags.some(tag => tag.toLowerCase().includes(this.searchQuery));
-      return matchesCategory && matchesSearch;
-    });
+    try {
+      const creatorsList = await window.KreasiDB.getCreators();
+      const worksList = await window.KreasiDB.getWorks();
+      this.bentoGrid.innerHTML = "";
 
-    if (filteredWorks.length === 0) {
-      this.bentoGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; border: 3px dashed var(--border-color); background-color: var(--card-bg);">
-          <i class="fa-solid fa-face-sad-tear" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-primary);"></i>
-          <h3 style="font-family: var(--font-heading); margin-bottom: 8px;">Karya Tidak Ditemukan</h3>
-          <p style="color: var(--text-secondary);">Coba cari kata kunci lain atau bagikan karya pertamamu sekarang!</p>
-        </div>
-      `;
-      return;
-    }
-
-    filteredWorks.forEach(work => {
-      const creator = creatorsList[work.authorId] || this.currentUser || { displayName: "User", username: "@deleted", avatar: "Felix" };
-      const card = document.createElement("article");
-      card.className = `bento-card ${work.layoutClass || "regular"}`;
-      card.id = `card-${work.id}`;
-
-      // Construct category icon
-      let typeIcon = "fa-palette";
-      if (work.type === "beats") typeIcon = "fa-music";
-      else if (work.type === "writing") typeIcon = "fa-pen-nib";
-      else if (work.type === "code") typeIcon = "fa-code";
-
-      // Render custom template depending on work type
-      let bodyHTML = "";
-      if (work.type === "art") {
-        const fallBackImg = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80";
-        bodyHTML = `
-          <div class="card-body art">
-            <img src="${work.mediaUrl || fallBackImg}" alt="${work.title}" loading="lazy">
-          </div>
-        `;
-      } else if (work.type === "writing") {
-        bodyHTML = `
-          <div class="card-body text">
-            <p class="text-quote">"${work.content ? work.content.split('\n')[0] : work.description}"</p>
-            <p style="font-size:0.75rem; color:var(--accent-secondary); font-family:var(--font-heading); text-transform:uppercase;">[ Baca Selengkapnya ]</p>
-          </div>
-        `;
-      } else if (work.type === "code") {
-        bodyHTML = `
-          <div class="card-body code">
-            <pre class="code-pre"><code>${work.content ? this.escapeHTML(work.content) : work.description}</code></pre>
-          </div>
-        `;
-      } else if (work.type === "beats") {
-        bodyHTML = `
-          <div class="card-body beats">
-            <div class="music-title-wrap">
-              <div class="music-vinyl" id="vinyl-${work.id}"></div>
-              <div class="music-info">
-                <h4>${work.title}</h4>
-                <p>${creator.displayName}</p>
-              </div>
-            </div>
-            <div class="player-controls">
-              <button class="play-pause-btn" data-beat-id="${work.id}" id="play-btn-${work.id}">
-                <i class="fa-solid fa-play"></i>
-              </button>
-              <div class="audio-bar-mock">
-                <div class="audio-progress-mock" id="progress-${work.id}" style="width: 0%;"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      card.innerHTML = `
-        <div class="card-header">
-          <div class="card-author" style="cursor: pointer;">
-            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=${creator.avatar}" alt="Avatar">
-            <span>${creator.username}</span>
-          </div>
-          <div class="card-tag"><i class="fa-solid ${typeIcon}"></i> ${work.type}</div>
-        </div>
-        ${bodyHTML}
-        <div class="card-footer">
-          <div class="card-title">${work.title}</div>
-          <div class="card-stats">
-            <span><i class="fa-solid fa-heart"></i> ${work.likes}</span>
-            <span><i class="fa-solid fa-comment"></i> ${work.comments.length}</span>
-          </div>
-        </div>
-      `;
-
-      // Click card logic
-      card.addEventListener("click", (e) => {
-        if (e.target.closest(".play-pause-btn")) {
-          e.stopPropagation();
-          const beatId = e.target.closest(".play-pause-btn").dataset.beatId;
-          this.toggleBeat(beatId);
-        } else if (e.target.closest(".card-author")) {
-          e.stopPropagation();
-          this.openCreatorProfile(work.authorId);
-        } else {
-          this.openDetailModal(work.id);
-        }
+      const filteredWorks = worksList.filter(work => {
+        const creator = creatorsList[work.authorId] || this.currentUser || { displayName: "User", username: "@deleted" };
+        const matchesCategory = this.activeCategory === "all" || work.type === this.activeCategory;
+        const matchesSearch = work.title.toLowerCase().includes(this.searchQuery) ||
+                              creator.displayName.toLowerCase().includes(this.searchQuery) ||
+                              creator.username.toLowerCase().includes(this.searchQuery) ||
+                              work.tags.some(tag => tag.toLowerCase().includes(this.searchQuery));
+        return matchesCategory && matchesSearch;
       });
 
-      this.bentoGrid.appendChild(card);
-    });
+      if (filteredWorks.length === 0) {
+        this.bentoGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; border: 3px dashed var(--border-color); background-color: var(--card-bg);">
+            <i class="fa-solid fa-face-sad-tear" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-primary);"></i>
+            <h3 style="font-family: var(--font-heading); margin-bottom: 8px;">Karya Tidak Ditemukan</h3>
+            <p style="color: var(--text-secondary);">Coba cari kata kunci lain atau bagikan karya pertamamu sekarang!</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredWorks.forEach(work => {
+        const creator = creatorsList[work.authorId] || this.currentUser || { displayName: "User", username: "@deleted", avatar: "Felix" };
+        const card = document.createElement("article");
+        card.className = `bento-card ${work.layoutClass || "regular"}`;
+        card.id = `card-${work.id}`;
+
+        let typeIcon = "fa-palette";
+        if (work.type === "beats") typeIcon = "fa-music";
+        else if (work.type === "writing") typeIcon = "fa-pen-nib";
+        else if (work.type === "code") typeIcon = "fa-code";
+
+        let bodyHTML = "";
+        if (work.type === "art") {
+          const fallBackImg = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80";
+          bodyHTML = `
+            <div class="card-body art">
+              <img src="${work.mediaUrl || fallBackImg}" alt="${work.title}" loading="lazy">
+            </div>
+          `;
+        } else if (work.type === "writing") {
+          bodyHTML = `
+            <div class="card-body text">
+              <p class="text-quote">"${work.content ? work.content.split('\n')[0] : work.description}"</p>
+              <p style="font-size:0.75rem; color:var(--accent-secondary); font-family:var(--font-heading); text-transform:uppercase;">[ Baca Selengkapnya ]</p>
+            </div>
+          `;
+        } else if (work.type === "code") {
+          bodyHTML = `
+            <div class="card-body code">
+              <pre class="code-pre"><code>${work.content ? this.escapeHTML(work.content) : work.description}</code></pre>
+            </div>
+          `;
+        } else if (work.type === "beats") {
+          bodyHTML = `
+            <div class="card-body beats">
+              <div class="music-title-wrap">
+                <div class="music-vinyl" id="vinyl-${work.id}"></div>
+                <div class="music-info">
+                  <h4>${work.title}</h4>
+                  <p>${creator.displayName}</p>
+                </div>
+              </div>
+              <div class="player-controls">
+                <button class="play-pause-btn" data-beat-id="${work.id}" id="play-btn-${work.id}">
+                  <i class="fa-solid fa-play"></i>
+                </button>
+                <div class="audio-bar-mock">
+                  <div class="audio-progress-mock" id="progress-${work.id}" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-author" style="cursor: pointer;">
+              <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=${creator.avatar}" alt="Avatar">
+              <span>${creator.username}</span>
+            </div>
+            <div class="card-tag"><i class="fa-solid ${typeIcon}"></i> ${work.type}</div>
+          </div>
+          ${bodyHTML}
+          <div class="card-footer">
+            <div class="card-title">${work.title}</div>
+            <div class="card-stats">
+              <span><i class="fa-solid fa-heart"></i> ${work.likes}</span>
+              <span><i class="fa-solid fa-comment"></i> ${work.comments ? work.comments.length : 0}</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".play-pause-btn")) {
+            e.stopPropagation();
+            const beatId = e.target.closest(".play-pause-btn").dataset.beatId;
+            this.toggleBeat(beatId);
+          } else if (e.target.closest(".card-author")) {
+            e.stopPropagation();
+            this.openCreatorProfile(work.authorId);
+          } else {
+            this.openDetailModal(work.id);
+          }
+        });
+
+        this.bentoGrid.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+      this.bentoGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; border: 3px dashed var(--accent-primary); background-color: var(--card-bg);">
+          <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-primary);"></i>
+          <h3 style="font-family: var(--font-heading); margin-bottom: 8px;">Gagal Memuat Feed</h3>
+          <p style="color: var(--text-secondary);">${err.message}</p>
+        </div>
+      `;
+    }
   }
 
   escapeHTML(text) {
@@ -579,7 +594,6 @@ class KreasiApp {
       return;
     }
 
-    // Restore own buttons and headers
     this.dashboardEditBtn.style.display = "inline-flex";
     this.dashboardLogoutBtn.style.display = "inline-flex";
     document.querySelector("#profile-dashboard-modal h2").textContent = "Dashboard Profil";
@@ -608,7 +622,6 @@ class KreasiApp {
       this.historyContentComments.style.display = "flex";
     }
     
-    // Check if viewing someone else or ourselves
     const modalTitle = document.querySelector("#profile-dashboard-modal h2").textContent;
     if (modalTitle === "Dashboard Profil") {
       this.renderAccountHistory();
@@ -676,10 +689,9 @@ class KreasiApp {
 
   // --- GENERAL CREATOR PROFILE ROUTER ---
   async openCreatorProfile(authorId) {
-    const creatorsList = window.KreasiDB.getCreators();
+    const creatorsList = await window.KreasiDB.getCreators();
     let creator = creatorsList[authorId];
     
-    // If it's the current logged in user
     if (authorId === "user" || (this.currentUser && creator && creator.id === this.currentUser.id)) {
       this.openProfileDashboard();
       return;
@@ -690,21 +702,18 @@ class KreasiApp {
     }
 
     if (this.currentUser) {
-      // Logged in: show view-only dashboard of other user
       this.openOtherProfileDashboard(creator);
     } else {
-      // Guest: show limited profile modal
       this.openLimitedProfileModal(creator);
     }
   }
 
   async openCreatorProfileByUsername(username) {
-    const creatorsList = window.KreasiDB.getCreators();
+    const creatorsList = await window.KreasiDB.getCreators();
     const creator = Object.values(creatorsList).find(c => c.username === username);
     if (creator) {
       this.openCreatorProfile(creator.id);
     } else {
-      // Fallback
       if (this.currentUser && this.currentUser.username === username) {
         this.openProfileDashboard();
       } else {
@@ -862,44 +871,45 @@ class KreasiApp {
 
     if (!title || !description) return;
 
-    const worksList = window.KreasiDB.getWorks();
-    
-    let layoutClass = "regular";
-    if (type === "art" && worksList.length % 2 === 0) layoutClass = "tall";
-    if (type === "writing") layoutClass = "wide";
+    try {
+      let layoutClass = "regular";
+      const worksList = await window.KreasiDB.getWorks();
+      if (type === "art" && worksList.length % 2 === 0) layoutClass = "tall";
+      if (type === "writing") layoutClass = "wide";
 
-    const newWork = {
-      id: `work-${Date.now()}`,
-      type: type,
-      title: title,
-      authorId: this.currentUser.id,
-      mediaUrl: mediaUrl,
-      content: (type === "writing" || type === "code") ? content : "",
-      description: description,
-      tags: tags,
-      likes: 0,
-      likedBy: [],
-      comments: [],
-      layoutClass: layoutClass
-    };
+      const newWork = {
+        id: `work-${Date.now()}`,
+        type: type,
+        title: title,
+        authorId: this.currentUser.id,
+        mediaUrl: mediaUrl,
+        content: (type === "writing" || type === "code") ? content : "",
+        description: description,
+        tags: tags,
+        likes: 0,
+        likedBy: [],
+        comments: [],
+        layoutClass: layoutClass
+      };
 
-    worksList.unshift(newWork);
-    window.KreasiDB.saveWorks(worksList);
-
-    this.closeModal(this.createModal);
-    this.renderFeed();
-    this.updateStats();
-    alert("Karyamu berhasil dipublikasikan!");
+      await window.KreasiDB.saveWork(newWork);
+      this.closeModal(this.createModal);
+      this.renderFeed();
+      await this.updateStats();
+      alert("Karyamu berhasil dipublikasikan!");
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+    }
   }
 
   // --- WORK DETAILS & INTERACTION CONTROLLER ---
-  openDetailModal(workId) {
+  async openDetailModal(workId) {
     this.activeDetailId = workId;
-    const worksList = window.KreasiDB.getWorks();
+    const worksList = await window.KreasiDB.getWorks();
     const work = worksList.find(w => w.id === workId);
     if (!work) return;
 
-    const creatorsList = window.KreasiDB.getCreators();
+    const creatorsList = await window.KreasiDB.getCreators();
     const creator = creatorsList[work.authorId] || this.currentUser || { displayName: "User", username: "@deleted", avatar: "Felix" };
 
     this.detailTitle.textContent = work.title;
@@ -958,10 +968,10 @@ class KreasiApp {
   }
 
   renderComments(comments) {
-    this.detailCommentsCount.textContent = comments.length;
+    this.detailCommentsCount.textContent = comments ? comments.length : 0;
     this.detailCommentsList.innerHTML = "";
 
-    if (comments.length === 0) {
+    if (!comments || comments.length === 0) {
       this.detailCommentsList.innerHTML = `<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">Belum ada komentar. Jadilah yang pertama berkomentar!</p>`;
       return;
     }
@@ -1000,10 +1010,6 @@ class KreasiApp {
     }
 
     const workId = this.activeDetailId;
-    const worksList = window.KreasiDB.getWorks();
-    const work = worksList.find(w => w.id === workId);
-    if (!work) return;
-
     const commentText = this.detailCommentInput.value.trim();
     if (!commentText) return;
 
@@ -1014,13 +1020,22 @@ class KreasiApp {
       time: "Baru saja"
     };
 
-    work.comments.push(newComment);
-    window.KreasiDB.saveWorks(worksList);
-    
-    this.detailCommentInput.value = "";
-    this.renderComments(work.comments);
-    this.renderFeed();
-    this.updateStats();
+    try {
+      await window.KreasiDB.addComment(workId, newComment);
+      this.detailCommentInput.value = "";
+      
+      // Fetch updated work to refresh comments list
+      const worksList = await window.KreasiDB.getWorks();
+      const updatedWork = worksList.find(w => w.id === workId);
+      if (updatedWork) {
+        this.renderComments(updatedWork.comments);
+      }
+      
+      this.renderFeed();
+      await this.updateStats();
+    } catch (err) {
+      alert("Comment failed: " + err.message);
+    }
   }
 
   async handleLikeClick(e) {
@@ -1031,32 +1046,33 @@ class KreasiApp {
     }
 
     const workId = this.activeDetailId;
-    const worksList = window.KreasiDB.getWorks();
-    const work = worksList.find(w => w.id === workId);
-    if (!work) return;
-
     const username = this.currentUser.username;
-    const alreadyLiked = work.likedBy.includes(username);
-    
-    if (alreadyLiked) {
-      work.likes--;
-      work.likedBy = work.likedBy.filter(u => u !== username);
-      this.detailLikeBtn.classList.remove("liked");
-      this.detailLikeBtn.style.backgroundColor = "";
-      this.detailLikeBtn.style.color = "";
-    } else {
-      work.likes++;
-      work.likedBy.push(username);
-      this.detailLikeBtn.classList.add("liked");
-      this.detailLikeBtn.style.backgroundColor = "var(--accent-primary)";
-      this.detailLikeBtn.style.color = "#ffffff";
-      this.spawnLikeParticles(e);
-    }
 
-    this.detailLikeCount.textContent = work.likes;
-    window.KreasiDB.saveWorks(worksList);
-    this.renderFeed();
-    this.updateStats();
+    try {
+      await window.KreasiDB.toggleLike(workId, username);
+      
+      const updatedWorks = await window.KreasiDB.getWorks();
+      const updatedWork = updatedWorks.find(w => w.id === workId);
+      
+      if (updatedWork) {
+        this.detailLikeCount.textContent = updatedWork.likes;
+        if (updatedWork.likedBy.includes(username)) {
+          this.detailLikeBtn.classList.add("liked");
+          this.detailLikeBtn.style.backgroundColor = "var(--accent-primary)";
+          this.detailLikeBtn.style.color = "#ffffff";
+          this.spawnLikeParticles(e);
+        } else {
+          this.detailLikeBtn.classList.remove("liked");
+          this.detailLikeBtn.style.backgroundColor = "";
+          this.detailLikeBtn.style.color = "";
+        }
+      }
+      
+      this.renderFeed();
+      await this.updateStats();
+    } catch (err) {
+      alert("Like failed: " + err.message);
+    }
   }
 
   spawnLikeParticles(e) {
