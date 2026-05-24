@@ -390,14 +390,14 @@ class KreasiApp {
         } else if (work.type === "writing") {
           bodyHTML = `
             <div class="card-body text">
-              <p class="text-quote">"${work.content ? work.content.split('\n')[0] : work.description}"</p>
+              <p class="text-quote">"${work.content ? work.content.replace(/\\n/g, '\n').split('\n')[0] : work.description}"</p>
               <p style="font-size:0.75rem; color:var(--accent-secondary); font-family:var(--font-heading); text-transform:uppercase;">[ Baca Selengkapnya ]</p>
             </div>
           `;
         } else if (work.type === "code") {
           bodyHTML = `
             <div class="card-body code">
-              <pre class="code-pre"><code>${work.content ? this.escapeHTML(work.content) : work.description}</code></pre>
+              <pre class="code-pre"><code>${work.content ? this.escapeHTML(work.content.replace(/\\n/g, '\n')) : work.description}</code></pre>
             </div>
           `;
         } else if (work.type === "beats") {
@@ -945,10 +945,10 @@ class KreasiApp {
       this.detailMediaContainer.innerHTML = `<img src="${work.mediaUrl || fallBackImg}" alt="${work.title}">`;
     } else if (work.type === "writing") {
       this.detailMediaContainer.classList.add("text-view");
-      this.detailMediaContainer.innerHTML = `<div>${work.content ? work.content.replace(/\n/g, '<br>') : work.description}</div>`;
+      this.detailMediaContainer.innerHTML = `<div>${work.content ? work.content.replace(/\\n/g, '\n').replace(/\n/g, '<br>') : work.description}</div>`;
     } else if (work.type === "code") {
       this.detailMediaContainer.classList.add("code-view");
-      this.detailMediaContainer.innerHTML = `<pre><code>${work.content ? this.escapeHTML(work.content) : work.description}</code></pre>`;
+      this.detailMediaContainer.innerHTML = `<pre><code>${work.content ? this.escapeHTML(work.content.replace(/\\n/g, '\n')) : work.description}</code></pre>`;
     } else if (work.type === "beats") {
       this.detailMediaContainer.classList.add("beats-view");
       this.detailMediaContainer.innerHTML = `
