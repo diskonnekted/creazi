@@ -529,7 +529,7 @@ class KreasiApp {
       this.authTabRegister.classList.remove("active");
       this.loginForm.style.display = "block";
       this.registerForm.style.display = "none";
-      document.getElementById("auth-modal-title").textContent = "Masuk ke KREASI";
+      document.getElementById("auth-modal-title").textContent = "Masuk ke KreaZi";
     } else {
       this.authTabLogin.classList.remove("active");
       this.authTabRegister.classList.add("active");
@@ -564,7 +564,7 @@ class KreasiApp {
 
     const avatars = ["Felix", "Bella", "Jack", "Milo", "Chloe"];
     const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-    const bio = "Creator baru di KREASI. Salam kenal!";
+    const bio = "Creator baru di KreaZi. Salam kenal!";
 
     try {
       const user = await window.KreasiDB.signUp(email, password, username, displayName, avatar, bio);
@@ -717,7 +717,7 @@ class KreasiApp {
       if (this.currentUser && this.currentUser.username === username) {
         this.openProfileDashboard();
       } else {
-        const mockCreator = { displayName: username.substring(1), username: username, avatar: "Felix", bio: "Member KREASI." };
+        const mockCreator = { displayName: username.substring(1), username: username, avatar: "Felix", bio: "Member KreaZi." };
         if (this.currentUser) {
           this.openOtherProfileDashboard(mockCreator);
         } else {
