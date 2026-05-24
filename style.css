@@ -177,6 +177,7 @@ a {
   padding: 3px 6px;
   background-color: var(--text-primary);
   color: var(--bg-primary);
+  -webkit-text-fill-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   margin-left: 5px;
   vertical-align: middle;
