@@ -46,6 +46,27 @@ class KreasiDatabase {
     }
   }
 
+  // Helper to block calls until Supabase Client is ready
+  async ensureClientReady() {
+    if (!this.isSupabase) return;
+    if (this.supabaseClient) return;
+
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (this.supabaseClient) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 50);
+
+      // Safety timeout after 5 seconds
+      setTimeout(() => {
+        clearInterval(interval);
+        resolve();
+      }, 5000);
+    });
+  }
+
   // --- LOCALSTORAGE INITIALIZATION ---
   initLocalStorageDB() {
     console.log("KREASI: Menggunakan Database LocalStorage (Simulasi)");
@@ -167,6 +188,7 @@ class KreasiDatabase {
   
   async getCreators() {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       if (!this.supabaseClient) return {};
       const { data: profiles, error } = await this.supabaseClient
         .from('profiles')
@@ -191,6 +213,7 @@ class KreasiDatabase {
 
   async getWorks() {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       if (!this.supabaseClient) return [];
       const { data: works, error } = await this.supabaseClient
         .from('works')
@@ -199,7 +222,6 @@ class KreasiDatabase {
         console.error("Error fetching works:", error);
         return [];
       }
-      // Sort works by created_at descending (latest first)
       works.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       return works;
     } else {
@@ -219,6 +241,7 @@ class KreasiDatabase {
   
   async getCurrentUser() {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       if (!this.supabaseClient) return null;
       const { data: { user } } = await this.supabaseClient.auth.getUser();
       if (!user) return null;
@@ -240,6 +263,7 @@ class KreasiDatabase {
     }
 
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { data, error } = await this.supabaseClient.auth.signUp({ email, password });
       if (error) throw error;
       
@@ -286,6 +310,7 @@ class KreasiDatabase {
 
   async signIn(email, password) {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { data, error } = await this.supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
@@ -310,6 +335,7 @@ class KreasiDatabase {
 
   async signOut() {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { error } = await this.supabaseClient.auth.signOut();
       if (error) throw error;
     } else {
@@ -326,6 +352,7 @@ class KreasiDatabase {
     if (!currentUser) throw new Error("Anda harus masuk terlebih dahulu!");
 
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { error } = await this.supabaseClient
         .from('profiles')
         .update({ displayName, username, avatar, bio })
@@ -368,6 +395,7 @@ class KreasiDatabase {
   // --- SAVE WORK ---
   async saveWork(work) {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { error } = await this.supabaseClient
         .from('works')
         .insert([{
@@ -394,6 +422,7 @@ class KreasiDatabase {
   // --- ADD COMMENT ---
   async addComment(workId, comment) {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { error } = await this.supabaseClient
         .from('comments')
         .insert([{
@@ -416,6 +445,7 @@ class KreasiDatabase {
   // --- TOGGLE LIKE ---
   async toggleLike(workId, username) {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { data: work, error } = await this.supabaseClient
         .from('works')
         .select('likes, likedBy')
@@ -458,6 +488,7 @@ class KreasiDatabase {
   // --- ACCOUNT HISTORY & RETRIEVAL ---
   async getAccountHistory(userId) {
     if (this.isSupabase) {
+      await this.ensureClientReady();
       const { data: works } = await this.supabaseClient
         .from('works')
         .select('*')
