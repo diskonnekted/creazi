@@ -567,11 +567,16 @@ class KreasiApp {
     const bio = "Creator baru di KreaZi. Salam kenal!";
 
     try {
-      const user = await window.KreasiDB.signUp(email, password, username, displayName, avatar, bio);
+      const result = await window.KreasiDB.signUp(email, password, username, displayName, avatar, bio);
       this.closeModal(this.authModal);
-      await this.checkAuthSession();
-      this.renderFeed();
-      alert(`Pendaftaran sukses! Selamat datang, ${user.displayName}!`);
+      
+      if (result.emailConfirmationRequired) {
+        alert("Pendaftaran berhasil! Silakan periksa kotak masuk email Anda (termasuk folder spam) untuk mengonfirmasi akun Anda sebelum masuk.");
+      } else {
+        await this.checkAuthSession();
+        this.renderFeed();
+        alert(`Pendaftaran sukses! Selamat datang, ${result.displayName}!`);
+      }
     } catch (err) {
       alert("Error: " + err.message);
     }

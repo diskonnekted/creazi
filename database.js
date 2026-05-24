@@ -267,18 +267,40 @@ class KreasiDatabase {
       const { data, error } = await this.supabaseClient.auth.signUp({ email, password });
       if (error) throw error;
       
-      const { error: profileError } = await this.supabaseClient
+      if (!data || !data.user) {
+        throw new Error("Pendaftaran gagal. Email mungkin sudah terdaftar atau memerlukan verifikasi.");
+      }
+      
+      // Cek apakah profil sudah ada untuk menghindari error duplikasi key
+      const { data: existingProfile } = await this.supabaseClient
         .from('profiles')
-        .insert([{
-          id: data.user.id,
-          username,
-          displayName,
-          avatar,
-          bio,
-          email
-        }]);
-      if (profileError) throw profileError;
-      return { id: data.user.id, username, displayName, avatar, bio, email };
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (!existingProfile) {
+        const { error: profileError } = await this.supabaseClient
+          .from('profiles')
+          .insert([{
+            id: data.user.id,
+            username,
+            displayName,
+            avatar,
+            bio,
+            email
+          }]);
+        if (profileError) throw profileError;
+      }
+      
+      return { 
+        id: data.user.id, 
+        username, 
+        displayName, 
+        avatar, 
+        bio, 
+        email,
+        emailConfirmationRequired: data.session === null
+      };
     } else {
       const creators = this.getCreators();
       
